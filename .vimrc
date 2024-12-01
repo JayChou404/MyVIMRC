@@ -183,3 +183,20 @@ let g:vimwiki_list = [{'path': '~/vimwiki/', 'syntax': 'markdown', 'ext': '.md'}
 "================================
 " IDEAvim 配置
 "================================
+syntax on
+set number
+set relativenumber
+set cursorline
+set wrap
+set wildmenu
+
+set termencoding=utf-8
+set encoding=utf-8
+
+" 默认寄存器与系统剪贴板同步
+set clipboard=unnamedplus
+
+map S :w<CR>
+map Q :q<CR>
+map R :source $MYVIMRC<CR>
+
