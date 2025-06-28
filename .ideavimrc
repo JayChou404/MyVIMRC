@@ -4,8 +4,7 @@
 " ======================================================
 
 " 1. 调用“通用核心”配置
-source ~/.config/vim_core/common_settings.vim
+source /vim_core/common_settings.vim
 
 " 2. 调用“PyCharm专属”配置
-"    注意：这里我们【没有】加载 neovim_special.vim
-source ~/.config/vim_core/pycharm_special.vim
+source /vim_core/pycharm_special.vim
