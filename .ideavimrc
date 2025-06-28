@@ -1,10 +1,10 @@
 " ======================================================
 "  IdeaVim (PyCharm, etc.) Main Entry Point
-"  File: ~/.ideavimrc
 " ======================================================
 
-" 1. 调用“通用核心”配置
-source /vim_core/common_settings.vim
+" 获取当前文件(.ideavimrc)所在的目录，也就是 dotfiles 仓库的根目录
+let s:dotfiles_root = fnamemodify(expand('<sfile>:p'), ':h')
 
-" 2. 调用“PyCharm专属”配置
-source /vim_core/pycharm_special.vim
+" 使用拼接出来的绝对路径来 source 我们的配置模块
+execute 'source' s:dotfiles_root . '/vim_core/common_settings.vim'
+execute 'source' s:dotfiles_root . '/vim_core/pycharm_special.vim'
