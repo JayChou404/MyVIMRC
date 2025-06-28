@@ -1,56 +1,66 @@
-#!/bin/bash
-# =============================================================================
-#  Dotfiles Installation Bootstrap Script
-#  This script creates symlinks from the home directory to the dotfiles in
-#  this repository.
-# =============================================================================
+# install.py
+import os
+import sys
+import shutil
+from pathlib import Path
+from datetime import datetime
 
-# 获取仓库的绝对路径
-# $(pwd) 会获取当前脚本所在的目录
-DOTFILES_DIR=$(pwd)
-BACKUP_DIR=~/dotfiles_backup_$(date +%Y%m%d_%H%M%S)
-
-echo "🚀 Starting Dotfiles setup..."
-echo "---------------------------------"
-
-# 一个安全的创建符号链接的函数
-# 参数1: 源文件 (在dotfiles仓库里)
-# 参数2: 目标文件 (在你电脑的home目录里)
-setup_symlink() {
-    local source_file=$1
-    local target_file=$2
-    local target_dir=$(dirname "${target_file}")
-
-    # --- 1. 确保目标目录存在 ---
-    if [ ! -d "${target_dir}" ]; then
-        echo "Creating directory: ${target_dir}"
-        mkdir -p "${target_dir}"
-    fi
-
-    # --- 2. 如果目标位置已经存在文件或链接，先备份它 ---
-    if [ -e "${target_file}" ] || [ -L "${target_file}" ]; then
-        echo "Backing up existing file: ${target_file}"
-        # 确保备份目录存在
-        mkdir -p "$(dirname "${BACKUP_DIR}${target_file}")"
-        mv "${target_file}" "${BACKUP_DIR}${target_file}"
-    fi
-
-    # --- 3. 创建新的符号链接 ---
-    echo "Linking ${source_file} to ${target_file}"
-    ln -s "${source_file}" "${target_file}"
+# --- 配置区 ---
+# 定义你的配置文件和它们应该被链接到的目标位置
+# Path.home() 会自动获取当前用户的主目录 (e.g., /home/user or C:\Users\user)
+DOTFILES = {
+    ".ideavimrc": Path.home() / ".ideavimrc",
+    ".config/nvim/init.vim": Path.home() / ".config/nvim/init.vim",
+    # 未来可添加更多, e.g., ".zshrc": Path.home() / ".zshrc"
 }
+# --- 配置区结束 ---
 
-# --- 开始执行链接 ---
+def setup_symlink(source: Path, target: Path):
+    """安全地创建符号链接，并备份已存在的文件。"""
+    print(f"Processing: {target}...")
 
-# 链接 .ideavimrc
-setup_symlink "${DOTFILES_DIR}/.ideavimrc" "${HOME}/.ideavimrc"
+    # 1. 确保目标目录存在
+    target.parent.mkdir(parents=True, exist_ok=True)
 
-# 链接 Neovim 的 init.vim
-setup_symlink "${DOTFILES_DIR}/.config/nvim/init.vim" "${HOME}/.config/nvim/init.vim"
+    # 2. 如果目标位置已存在文件或链接，先备份
+    if target.exists() or target.is_symlink():
+        backup_path = backup_dir / target.relative_to(Path.home())
+        print(f"  -> Backing up existing file to {backup_path}")
+        backup_path.parent.mkdir(parents=True, exist_ok=True)
+        # 使用 shutil.move 来原子性地移动文件或目录
+        shutil.move(str(target), str(backup_path))
 
-# ... 未来你可以按此格式添加任何其他想要管理的配置文件 ...
-# 例如：setup_symlink "${DOTFILES_DIR}/.zshrc" "${HOME}/.zshrc"
+    # 3. 创建新的符号链接
+    try:
+        # os.symlink 在 Python 3.8+ 中有 target_is_directory 参数
+        # 在 Windows 上创建符号链接通常需要管理员权限或开启“开发人员模式”
+        os.symlink(source, target)
+        print(f"  -> Successfully linked {source} to {target}")
+    except OSError as e:
+        print(f"  -> ERROR: Could not create symlink for {target}. On Windows, this may require Admin rights or Developer Mode.", file=sys.stderr)
+        print(f"  -> Details: {e}", file=sys.stderr)
+    except Exception as e:
+        print(f"  -> ERROR: An unexpected error occurred: {e}", file=sys.stderr)
 
-echo "---------------------------------"
-echo "✅ Dotfiles setup complete!"
-echo "Old files have been backed up to: ${BACKUP_DIR}"
+
+if __name__ == "__main__":
+    # 获取仓库的根目录 (即 install.py 所在的目录)
+    dotfiles_dir = Path(__file__).parent.resolve()
+
+    # 创建一个统一的备份目录
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    backup_dir = Path.home() / f"dotfiles_backup_{timestamp}"
+    print(f"🚀 Starting Dotfiles setup...")
+    print(f"Source directory: {dotfiles_dir}")
+    print(f"Backups will be stored in: {backup_dir}")
+    print("-" * 30)
+
+    for source_name, target_path in DOTFILES.items():
+        source_path = dotfiles_dir / source_name
+        if source_path.exists():
+            setup_symlink(source_path, target_path)
+        else:
+            print(f"  -> WARNING: Source file not found, skipping: {source_path}", file=sys.stderr)
+
+    print("-" * 30)
+    print("✅ Dotfiles setup complete!")
