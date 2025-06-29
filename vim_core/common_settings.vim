@@ -26,7 +26,6 @@ set ruler                       " 在右下角显示光标位置
 set showcmd                     " 在右下角实时显示你正在输入的命令
 set showmode                    " 在左下角显示当前模式
 set wildmenu                    " 开启命令模式的下拉菜单
-set wildoptions=list:longest
 set wrap                        " 自动折行显示过长的行
 set scrolloff=10                " [优化] 光标上下保留10行上下文，阅读更流畅
 set cmdheight=2                 " [新增] 命令区高度设为2行，避免信息被截断
