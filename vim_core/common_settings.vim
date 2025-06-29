@@ -66,7 +66,5 @@ nnoremap <Space> <Nop>
 " --- 实用快捷键 ---
 " <Leader>w : 快速保存
 nnoremap <leader>w :w<CR>
-" <Leader>q : 快速关闭窗口
-nnoremap <leader>q :q<CR>
 " <Leader><Space> : 清除搜索高亮
 nnoremap <leader><space> :nohlsearch<CR>
