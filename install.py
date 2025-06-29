@@ -17,16 +17,16 @@ HOME_DIR = Path.home()
 
 # 为不同系统定义 Neovim 的配置路径
 if IS_WINDOWS:
-    NEOVIM_CONFIG_TARGET = HOME_DIR / "AppData/Local/nvim/init.vim"
+    NEOVIM_CONFIG_TARGET = HOME_DIR / "AppData/Local/nvim/init.lua" # [修改] 目标文件也是 init.lua
 else: # Linux or macOS
-    NEOVIM_CONFIG_TARGET = HOME_DIR / ".config/nvim/init.vim"
+    NEOVIM_CONFIG_TARGET = HOME_DIR / ".config/nvim/init.lua" # [修改] 目标文件也是 init.lua
 
 # 定义 IdeaVim 的模板和目标文件
 IDEAVIM_TEMPLATE_SOURCE = DOTFILES_DIR / ".ideavimrc.template"
 IDEAVIM_TARGET = HOME_DIR / ".ideavimrc"
 
 # 定义需要被符号链接的文件 (Neovim入口文件)
-NEOVIM_CONFIG_SOURCE = DOTFILES_DIR / ".config/nvim/init.vim"
+NEOVIM_CONFIG_SOURCE = DOTFILES_DIR / "init.lua"
 
 # --- 3. 核心功能函数 ---
 
